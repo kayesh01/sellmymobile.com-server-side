@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 
@@ -18,6 +18,7 @@ async function run() {
     try {
         const phoneCollection = client.db('phoneResale').collection('phones')
         const brandCollection = client.db('phoneResale').collection('brands')
+        const bookingsCollection = client.db('phoneResale').collection('bookings')
 
         app.get('/brands', async (req, res) => {
             const query = {};
@@ -29,6 +30,11 @@ async function run() {
             const query = { id: (id) };
             const phone = await phoneCollection.find(query).toArray();
             res.send(phone);
+        });
+        app.post('/bookings', async (req, res) => {
+            const booking = req.body;
+            const result = await bookingsCollection.insertOne(booking);
+            res.send(result);
         })
     }
     finally {
