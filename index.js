@@ -92,7 +92,7 @@ async function run() {
             const email = req.params.email;
             const query = { email }
             const user = await usersCollection.findOne(query);
-            res.send({ isAdmin: user?.type === 'Seller' });
+            res.send({ isSeller: user?.type === 'Seller' });
         });
 
 
@@ -127,6 +127,22 @@ async function run() {
             const result = await usersCollection.insertOne(user);
             res.send(result);
         });
+        // app.get('/savephones', async (req, res) => {
+        //     const query = {};
+        //     const phones = await savePhonesCollection.find(query).toArray();
+        //     res.send(phones);
+        // });
+        app.post('/postphone', async (req, res) => {
+            const phone = req.body;
+            const result = await phoneCollection.insertOne(phone);
+            res.send(result);
+        })
+        app.get('/savephones/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { seller: email };
+            const phones = await savePhonesCollection.find(query).toArray();
+            res.send(phones);
+        })
         app.post('/savephones', async (req, res) => {
             const savephones = req.body;
             const result = await savePhonesCollection.insertOne(savephones);
