@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
@@ -81,6 +81,27 @@ async function run() {
             const users = await usersCollection.find(query).toArray();
             res.send(users);
         });
+        app.put('/sellers/verify/:id', verifyJWT, async (req, res) => {
+            const decodedEmail = req.decoded.email;
+            const query = { email: decodedEmail };
+            const user = await usersCollection.findOne(query);
+
+
+            if (user?.type !== 'admin') {
+                return res.status(403).send({ message: 'Forbidden accesss.' })
+            }
+
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    verified: true
+                }
+            }
+            const result = await usersCollection.updateOne(filter, updatedDoc, options);
+            res.send(result);
+        })
         app.get('/buyers', async (req, res) => {
             const query = { type: "Buyer" };
             const users = await usersCollection.find(query).toArray();
