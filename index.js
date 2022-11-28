@@ -75,7 +75,20 @@ async function run() {
                 return res.send({ accessToken: token })
             }
             res.status(403).send({ accessToken: '' })
-        })
+        });
+        app.get('/sellers', async (req, res) => {
+            const query = { type: "Seller" };
+            const users = await usersCollection.find(query).toArray();
+            res.send(users);
+        });
+        // find specific type
+        // app.get('/users/:type', async (req, res) => {
+        //     const type = req.params.type
+        //     const query = { type: type }
+        //     const users = await usersCollection.find(query).toArray();
+        //     res.send(users);
+
+        // });
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
