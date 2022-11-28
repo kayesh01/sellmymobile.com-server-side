@@ -38,6 +38,7 @@ async function run() {
         const brandCollection = client.db('phoneResale').collection('brands');
         const bookingsCollection = client.db('phoneResale').collection('bookings');
         const usersCollection = client.db('phoneResale').collection('users');
+        const savePhonesCollection = client.db('phoneResale').collection('savePhones');
 
         app.get('/brands', async (req, res) => {
             const query = {};
@@ -81,6 +82,20 @@ async function run() {
             const users = await usersCollection.find(query).toArray();
             res.send(users);
         });
+        app.get('/users/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query);
+            res.send({ isAdmin: user?.type === 'admin' });
+        });
+        app.get('/users/seller/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query);
+            res.send({ isAdmin: user?.type === 'Seller' });
+        });
+
+
         app.put('/sellers/verify/:id', verifyJWT, async (req, res) => {
             const decodedEmail = req.decoded.email;
             const query = { email: decodedEmail };
@@ -110,6 +125,11 @@ async function run() {
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
+            res.send(result);
+        });
+        app.post('/savephones', async (req, res) => {
+            const savephones = req.body;
+            const result = await savePhonesCollection.insertOne(savephones);
             res.send(result);
         })
     }
